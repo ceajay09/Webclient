@@ -11,6 +11,11 @@
 
     <dependencies>
         <!-- Hier können Sie alle benötigten Abhängigkeiten definieren -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version> <!-- oder die neueste Version -->
+        </dependency>
     </dependencies>
 
     <build>
