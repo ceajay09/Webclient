@@ -11,104 +11,46 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
+import java.util.Map;
 
+import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 public class Application {
 
-//    @Autowired
-//    private static AccountController accountController;
-    @Autowired
-    protected AccountRepository accountRepository;
-    @Autowired
-    protected SessionRepository sessionRepository;
+        // @Autowired
+        // private static AccountController accountController;
+        @Autowired
+        protected AccountRepository accountRepository;
+        @Autowired
+        protected SessionRepository sessionRepository;
 
-    public static void main(String[] args) throws SQLException {
+        private static final Logger logger = LogManager.getLogger(Application.class);
 
-        SpringApplication.run(Application.class, args);
+        public static void main(String[] args) throws SQLException {
 
+                SpringApplication.run(Application.class, args);
 
-        // Erstellen eines neuen Accounts
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        Account account = new Account();
-        account.setFirstName("Max");
-        account.setLastName("Mustermann");
-        account.setEmail("max.mustermann@example.com");
-        HttpEntity<Account> request = new HttpEntity<>(account, headers);
-        ResponseEntity<String> createResponse = restTemplate.postForEntity("http://localhost:8080/api/create-account", request, String.class);
-        System.out.println("Erstellung des Accounts war erfolgreich. Antwort vom Server: " + createResponse.getBody());
-
-//                 Abrufen des erstellten Accounts
-        ResponseEntity<Account> getResponse = restTemplate.getForEntity("http://localhost:8080/api/account/" + 1, Account.class);
-        System.out.println("Der abgerufene Account hat folgenden Namen + ID: " + getResponse.getBody().getFirstName() + " " + getResponse.getBody().getID());
-
-
-
-
-
-
-
-
-
-
-
-//                // Erstellen eines neuen Accounts
-//                RestTemplate restTemplate = new RestTemplate();
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.setContentType(MediaType.APPLICATION_JSON);
-//                Account account = new Account();
-//                account.setFirstName("Max");
-//                account.setLastName("Mustermann");
-//                account.setEmail("max.mustermann@example.com");
-//                HttpEntity<Account> request = new HttpEntity<>(account, headers);
-//                ResponseEntity<String> createResponse = restTemplate.postForEntity("http://localhost:8080/api/create-account", request, String.class);
-//                System.out.println("Erstellung des Accounts war erfolgreich. Antwort vom Server: " + createResponse.getBody());
-//
-////                 Abrufen des erstellten Accounts
-//                ResponseEntity<Account> getResponse = restTemplate.getForEntity("http://localhost:8080/" + account.getID(), Account.class);
-//                System.out.println("Der abgerufene Account hat folgende Daten: " + getResponse.getBody());
-
-
-
-
-
-
-//        SpringApplication.run(Application.class, args);
-//
-//        Connection conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "");
-//
-//        Statement stmt = conn.createStatement();
-//        stmt.executeUpdate("CREATE USER newuser PASSWORD 'newpassword'");
-//
-//        stmt.close();
-//        conn.close();
-//
-//
-//        RestTemplate restTemplate = new RestTemplate();
-//
-//        // create a new account
-//        String createAccountUrl = "http://localhost:8080/account/create";
-//        Account newAccount = new Account();
-//        newAccount.setFirstName("Cesar");
-//        newAccount.setCompany("company");
-//        newAccount.setEmail("mail");
-//        newAccount.setLastName("jaquiery");
-//        newAccount.setPhoneNumber("061");
-//
-//        accountController.createAccount(newAccount);
-//        restTemplate.postForObject(createAccountUrl, newAccount, Account.class);
-//
-//        // get all accounts
-//        String getAllAccountsUrl = "http://localhost:8080/account/all";
-//        Account[] allAccounts = restTemplate.getForObject(getAllAccountsUrl, Account[].class);
-//
-//        // print all accounts
-//        for (Account account : allAccounts) {
-//            System.out.println(account.toString());
         }
-    }
+
+        @PostConstruct
+        public void testdata() throws Exception {
+                Account a1 = new Account();
+                a1.setCompany("Google");
+                a1.setEmail("mail");
+                a1.setFirstName("Cesar");
+                a1.setLastName("Jaqu");
+                a1.setPassword("0000");
+                a1.setPhoneNumber("123");
+                this.accountRepository.save(a1);
+                System.out.println("testaccount erstellt, ID:" + a1.getID());
+        }
+
+}

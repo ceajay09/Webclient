@@ -1,11 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+// import SignInJs from './components/SignIn.js';
+// import SignIn from './components/SignIn';
+// import log4js from 'log4js';
+import { Login } from "./Login";
+import { Register } from "./Register";
+
+// const logger = log4js.getLogger('React-Logger');
 
 function App() {
+  const [currentForm, setCurrentForm] = useState('login');
+
+  const toggleForm = (formName: string) => {
+    setCurrentForm(formName);
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
+      {/* <header className="App-header">
 
         <img src={logo} className="App-logo" alt="logo" /> 
         <div>
@@ -22,7 +35,12 @@ function App() {
         >
           Learn React
         </a>
-      </header>
+        
+
+      </header> */}
+      {
+        currentForm === "login" ? <Login onFormSwitch={toggleForm} /> : <Register onFormSwitch={toggleForm} /> //wenn condition=login dann zu login bzw. wenn register dann zu register
+      }
     </div>
   );
 }
