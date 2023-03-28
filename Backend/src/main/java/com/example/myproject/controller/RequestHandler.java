@@ -35,25 +35,43 @@ public class RequestHandler {
         logger.info("Received registration request: email={}, firstName={}, lastName={}, company={}, phoneNumber={}",
                 email, firstName, lastName, company, phoneNumber);
 
-        Account account = new Account();
-        account.setEmail(email);
-        account.setPassword(password);
-        account.setFirstName(firstName);
-        account.setLastName(lastName);
-        account.setCompany(company);
-        account.setPhoneNumber(phoneNumber);
+        if (this.accountRepository.findByEmail(email) == null) {
+            // Account noch nicht vorhanden..
+            Account account = new Account();
+            account.setEmail(email);
+            account.setPassword(password);
+            account.setFirstName(firstName);
+            account.setLastName(lastName);
+            account.setCompany(company);
+            account.setPhoneNumber(phoneNumber);
 
-        this.accountRepository.save(account);
-        int accountID = this.accountRepository.findByEmail(account.getEmail()).getID();
+            this.accountRepository.save(account);
+            int accountID = this.accountRepository.findByEmail(account.getEmail()).getID();
 
-        // Integer id = account.getID();
-        System.out.println(account.getEmail() + " created / " + "ID = " + accountID);
+            // Integer id = account.getID();
+            System.out.println(account.getEmail() + " created / " + "ID = " + accountID);
 
-        // Log the response
-        String responseMessage = "User registered successfully";
-        logger.info("Registration response: {}", responseMessage);
+            // Log the response
+            String responseMessage = account.getEmail() + " registered successfully";
+            logger.info("Registration response: {}", responseMessage);
 
-        return ResponseEntity.ok("User registered successfully");
+            // return ResponseEntity.ok("Account registered successfully");
+            return ResponseEntity.ok().body("{\"status\":\"success\",\"message\":\"Account registered successfully\"}");
+
+            // return ResponseEntity.status(HttpStatus.OK).body("Account registered
+            // successfully");
+
+        } else {
+            // Log the response
+            String responseMessage = email + " registered already";
+            logger.info("Registration response: {}", responseMessage);
+
+            // Hier wird der HTTP-Statuscode "409" und die Nachricht "User already exists"
+            // zurückgegeben, dass der Benutzer bereits registriert ist und ein Konflikt
+            // aufgetreten ist.
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Account already exists");
+
+        }
     }
 
     // Abrufen eines Benutzers nach ID.

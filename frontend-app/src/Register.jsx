@@ -32,12 +32,26 @@ export const Register = (props) => {
             .then(data => {
                 console.log('Registration successful:', data);
                 // Hier können Sie die weitere Logik ausführen, z. B. den Benutzer zur Login-Seite weiterleiten
+                props.onFormSwitch('login')
+                handleReset()
             })
             .catch(error => {
                 console.error('Registration failed:', error);
                 // Hier können Sie Fehler behandeln, z. B. eine Fehlermeldung anzeigen
+                alert('Registration failed. User ' + '"' + email + '"' + ' already exists');
             });
+
     }
+
+    const handleReset = () => {
+        setEmail('');
+        setPassword('');
+        setFirstName('');
+        setLastName('');
+        setCompany('');
+        setPhoneNumber('');
+    };
+
 
     return (
         <div className="auth-form-container">
