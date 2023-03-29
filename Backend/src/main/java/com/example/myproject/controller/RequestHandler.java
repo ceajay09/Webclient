@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Date;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +22,8 @@ import io.jsonwebtoken.security.Keys;
 public class RequestHandler {
 
     private static final Logger logger = LogManager.getLogger(RequestHandler.class);
+
+    private final Key key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
 
     @Autowired
     private AccountRepository accountRepository;
@@ -97,7 +100,7 @@ public class RequestHandler {
 
                 Date expirationDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
                 String token = Jwts.builder()
-                        .setSubject(user.getId())
+                        .setSubject(account.getID())
                         .setExpiration(expirationDate)
                         .signWith(key)
                         .compact();
