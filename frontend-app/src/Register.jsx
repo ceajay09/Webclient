@@ -36,7 +36,7 @@ export const Register = (props) => {
                 handleReset()
             })
             .catch(error => {
-                console.error('Registration failed:', error);
+                console.error('Registration failed. User already exists:', error);
                 // Hier können Sie Fehler behandeln, z. B. eine Fehlermeldung anzeigen
                 alert('Registration failed. User ' + '"' + email + '"' + ' already exists');
             });

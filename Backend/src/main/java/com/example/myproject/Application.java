@@ -7,10 +7,7 @@ import com.example.myproject.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import java.sql.SQLException;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication
@@ -22,8 +19,6 @@ public class Application {
         protected AccountRepository accountRepository;
         @Autowired
         protected SessionRepository sessionRepository;
-
-        private static final Logger logger = LogManager.getLogger(Application.class);
 
         public static void main(String[] args) throws SQLException {
 
