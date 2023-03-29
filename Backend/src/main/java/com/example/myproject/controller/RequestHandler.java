@@ -7,9 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Date;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 // @RequestMapping("api/")
 @RestController
@@ -55,9 +59,8 @@ public class RequestHandler {
             String responseMessage = account.getEmail() + " registered successfully";
             logger.info("Registration response: {}", responseMessage);
 
-            // return ResponseEntity.ok("Account registered successfully");
             return ResponseEntity.ok().body("{\"status\":\"success\",\"message\":\"Account registered successfully\"}");
-
+            // return ResponseEntity.ok("Account registered successfully");
             // return ResponseEntity.status(HttpStatus.OK).body("Account registered
             // successfully");
 
@@ -71,6 +74,46 @@ public class RequestHandler {
             // aufgetreten ist.
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Account already exists");
 
+        }
+    }
+
+    @PostMapping(path = "/api/login", produces = "application/json")
+    public ResponseEntity<String> loginUser(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String password = request.get("password");
+
+        // Log the request
+        logger.info("Received registration request: email={}",
+                email);
+
+        Account account = this.accountRepository.findByEmail(email);
+
+        if (account != null) {
+            if (account.getPassword().equals(password)) {
+                // Passwort korrekt und Account vorhanden
+
+                String responseMessage = account.getEmail() + " Correct login credentials";
+                logger.info("Registration response: {}", responseMessage);
+
+                Date expirationDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
+                String token = Jwts.builder()
+                        .setSubject(user.getId())
+                        .setExpiration(expirationDate)
+                        .signWith(key)
+                        .compact();
+
+                return ResponseEntity.ok()
+                        .body("{\"status\":\"success\",\"message\":\"Login correct\"}");
+            } else {
+
+                String responseMessage = email + " Incorrect login credentials";
+                logger.info("Registration response: {}", responseMessage);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect login credentials");
+            }
+        } else {
+            String responseMessage = email + " Incorrect login credentials";
+            logger.info("Registration response: {}", responseMessage);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect login credentials");
         }
     }
 

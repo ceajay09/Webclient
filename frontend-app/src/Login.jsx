@@ -2,11 +2,56 @@ import React, { useState } from "react";
 
 export const Login = (props) => {
     const [email, setEmail] = useState('');
-    const [pass, setPass] = useState('');
+    const [password, setPassword] = useState('');
+
 
     const handleSubmit = (e) => {  //
         e.preventDefault(); //wenn Seite neu geladen wird, verliert ansonsten die informationen
         console.log(email);
+
+        // Hier wird die Fetch-Anfrage ausgeführt, um die Registrierungsdaten an das Backend zu senden
+        fetch('http://localhost:8080/api/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Login successful:', data);
+                // Hier können Sie die weitere Logik ausführen, z. B. den Benutzer zur Dashboard-Seite weiterleiten
+                localStorage.setItem('token', data.token); // Token im Local Storage speichern
+                props.handleLogin()
+                // Wenn der Benutzer angemeldet ist, wechsle zur Dashboard-Seite
+
+
+            })
+            .catch(error => {
+                console.error('Login failed. User or password not correct:', error);
+                // Hier können Sie Fehler behandeln, z. B. eine Fehlermeldung anzeigen
+                alert('Login failed. Please check your email and password.');
+            });
+
+        // const token = localStorage.getItem('token'); //Login-Token abrufen bei späteren abfragen
+        // fetch('http://localhost:8080/api/data', {
+        //     method: 'GET',
+        //     headers: {
+        //         'Authorization': `Bearer ${token}`
+        //     }
+        // })
+        //     .then(response => {
+        //         // ...
+        //     })
+        //     .catch(error => {
+        //         // ...
+        //     });
+
     }
 
     return (
@@ -14,9 +59,9 @@ export const Login = (props) => {
             <h2>Login</h2>
             <form className="login-form" onSubmit={handleSubmit}>
                 <label htmlFor="email">email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)}type="email" placeholder="youremail@gmail.com" id="email" name="email" /> 
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="youremail@gmail.com" id="email" name="email" />
                 <label htmlFor="password">password</label>
-                <input value={pass} onChange={(e) => setPass(e.target.value)} type="password" placeholder="********" id="password" name="password" />
+                <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="********" id="password" name="password" />
                 <button type="submit">Log In</button>
             </form>
             <button className="link-btn" onClick={() => props.onFormSwitch('register')}>Don't have an account? Register here.</button>
