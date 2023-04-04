@@ -8,13 +8,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import net.bytebuddy.asm.Advice.This;
 
 // @RequestMapping("api/")
 @RestController
@@ -63,9 +67,6 @@ public class RequestHandler {
             logger.info("Registration response: {}", responseMessage);
 
             return ResponseEntity.ok().body("{\"status\":\"success\",\"message\":\"Account registered successfully\"}");
-            // return ResponseEntity.ok("Account registered successfully");
-            // return ResponseEntity.status(HttpStatus.OK).body("Account registered
-            // successfully");
 
         } else {
             // Log the response
@@ -98,15 +99,16 @@ public class RequestHandler {
                 String responseMessage = account.getEmail() + " Correct login credentials";
                 logger.info("Registration response: {}", responseMessage);
 
-                Date expirationDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
-                String token = Jwts.builder()
-                        .setSubject(account.getID())
-                        .setExpiration(expirationDate)
-                        .signWith(key)
-                        .compact();
+                String token = this.createToken(account.getID().toString());
 
-                return ResponseEntity.ok()
-                        .body("{\"status\":\"success\",\"message\":\"Login correct\"}");
+                JSONObject responseObject = new JSONObject();
+                responseObject.put("status", "success");
+                responseObject.put("message", "Login correct");
+                responseObject.put("token", token);
+                return ResponseEntity.ok().body(responseObject.toString());
+
+                // return ResponseEntity.ok()
+                // .body("{\"status\":\"success\",\"message\":\"Login correct\"}");
             } else {
 
                 String responseMessage = email + " Incorrect login credentials";
@@ -125,5 +127,15 @@ public class RequestHandler {
     @GetMapping(path = "api/account/{id}", produces = "application/json")
     public Account getAccountById(@PathVariable Integer id) {
         return accountRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public String createToken(String accountID) {
+        Date expirationDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
+        String token = Jwts.builder()
+                .setSubject(accountID)
+                .setExpiration(expirationDate)
+                .signWith(key)
+                .compact();
+        return token;
     }
 }

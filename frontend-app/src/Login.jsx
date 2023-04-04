@@ -26,7 +26,8 @@ export const Login = (props) => {
             .then(data => {
                 console.log('Login successful:', data);
                 // Hier können Sie die weitere Logik ausführen, z. B. den Benutzer zur Dashboard-Seite weiterleiten
-                localStorage.setItem('token', data.token); // Token im Local Storage speichern
+                localStorage.setItem('token', data.token);
+                alert("token: " + localStorage.getItem('token')); // Token im Local Storage speichern
                 props.handleLogin()
                 // Wenn der Benutzer angemeldet ist, wechsle zur Dashboard-Seite
 
