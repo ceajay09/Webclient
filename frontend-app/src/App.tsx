@@ -17,11 +17,13 @@ function App() {
 
   }
   const handleLogin = () => {
+    console.log("handleLogin called");
     setIsLoggedIn(true);
     setCurrentForm("dashboard");
   };
 
   const handleLogout = () => {
+    console.log("handleLogout called");
     setIsLoggedIn(false);
     setCurrentForm("login");
     return;
@@ -30,13 +32,23 @@ function App() {
   return (
     <div className="App">
       {isLoggedIn ? (
-        <Dashboard props={undefined} onLogout={handleLogout} userInfo={{
-          firstName: '',
-          lastName: '',
-          email: '',
-          company: '',
-          phoneNumber: ''
-        }} />
+
+        // <Dashboard props={undefined} onLogout={handleLogout} userInfo={{
+        //   firstName: '',
+        //   lastName: '',
+        //   email: '',
+        //   company: '',
+        //   phoneNumber: ''
+        // }}
+        //  />
+
+        <Dashboard onLogout={handleLogout} userInfo={{
+          firstName: "",
+          lastName: "",
+          email: "",
+          company: "",
+          phoneNumber: "",
+        }} props={undefined} onFormSwitch={undefined} /> // TODO onformswitch hier evt falsch
       ) : (
         <>
           {currentForm === "login" ? (

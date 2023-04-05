@@ -30,10 +30,10 @@ public class Application {
         public void testdata() throws Exception {
                 Account a1 = new Account();
                 a1.setCompany("Google");
-                a1.setEmail("mail");
+                a1.setEmail("admin@admin.com");
                 a1.setFirstName("Cesar");
                 a1.setLastName("Jaqu");
-                a1.setPassword("0000");
+                a1.setPassword("admin@admin.com");
                 a1.setPhoneNumber("123");
                 this.accountRepository.save(a1);
                 System.out.println("testaccount erstellt, ID:" + a1.getID());

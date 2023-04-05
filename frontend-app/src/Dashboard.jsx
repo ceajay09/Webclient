@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 
-export const Dashboard = ({ props, onLogout, userInfo }) => {
+export const Dashboard = ({ props, onLogout, onFormSwitch, userInfo }) => {
     const [email, setEmail] = useState(userInfo.email);
     const [password, setPassword] = useState(userInfo.password);
     const [firstName, setFirstName] = useState(userInfo.firstName);
@@ -12,8 +12,16 @@ export const Dashboard = ({ props, onLogout, userInfo }) => {
 
     const handleLogout = () => {
         // Hier können Sie die Logik für die Abmeldung ausführen, z. B. das Löschen des Tokens aus dem Local Storage
-        // localStorage.removeItem('token');
-        props.onLogout();
+        console.log("Token : " + localStorage.getItem('token'))
+        localStorage.removeItem('token');
+        console.log("Token entfernt (null): " + localStorage.getItem('token'))
+        // props.onFormSwitch('login')
+        onLogout();
+        // props.onLogout();
+    };
+
+    const handleFormSwitch = (formName) => {
+        onFormSwitch(formName);
     };
 
     const handleSubmit = (e) => {
@@ -78,6 +86,12 @@ export const Dashboard = ({ props, onLogout, userInfo }) => {
                 <input type="text" id="phoneNumber" name="phoneNumber" value={phoneNumber} readOnly />
             </form>
             <button onClick={handleLogout}>Logout</button>
+            <button onClick={() => handleFormSwitch('updateUserInfo')}>
+                Update User Info
+            </button>
+            <button onClick={() => handleFormSwitch('changePassword')}>
+                Change Password
+            </button>
         </div>
     )
 }
