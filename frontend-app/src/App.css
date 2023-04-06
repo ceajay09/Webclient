@@ -25,6 +25,13 @@
     border-radius: 10px;
     margin: 0.5rem;
   }
+
+  .logout-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding-right: 40px;
+  }
 }
 
 label {

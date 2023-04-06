@@ -14,8 +14,8 @@ function App() {
 
   const toggleForm = (formName: string) => {
     setCurrentForm(formName);
-
   }
+
   const handleLogin = () => {
     console.log("handleLogin called");
     setIsLoggedIn(true);

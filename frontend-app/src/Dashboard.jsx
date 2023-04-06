@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { UserSettings } from "./UserSettings";
+
 
 
 export const Dashboard = ({ props, onLogout, onFormSwitch, userInfo }) => {
+    const [currentForm, setCurrentForm] = useState('Dashboard');
     const [email, setEmail] = useState(userInfo.email);
     const [password, setPassword] = useState(userInfo.password);
     const [firstName, setFirstName] = useState(userInfo.firstName);
@@ -15,44 +18,28 @@ export const Dashboard = ({ props, onLogout, onFormSwitch, userInfo }) => {
         console.log("Token : " + localStorage.getItem('token'))
         localStorage.removeItem('token');
         console.log("Token entfernt (null): " + localStorage.getItem('token'))
-        // props.onFormSwitch('login')
         onLogout();
-        // props.onLogout();
     };
 
-    const handleFormSwitch = (formName) => {
-        onFormSwitch(formName);
+    const handleFormSwitch = (UserSettings) => {
+        onFormSwitch(UserSettings);
     };
+
+    const toggleForm = (formName) => {
+        setCurrentForm(formName);
+    }
+
+    const handleUserSettings = () => {
+        console.log("handleUserSettings called");
+        setCurrentForm("UserSettings");
+    };
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(email);
 
         // Hier wird die Fetch-Anfrage ausgeführt, um die Registrierungsdaten an das Backend zu senden
-        fetch('http://localhost:8080/api/dashboard', {
-            method: 'POST',
-            body: JSON.stringify({ email, password, firstName, lastName, company, phoneNumber }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Registration successful:', data);
-                // Hier können Sie die weitere Logik ausführen, z. B. den Benutzer zur Login-Seite weiterleiten
-                props.onFormSwitch('dashboard')
-                handleReset()
-            })
-            .catch(error => {
-                console.error('Registration failed. User already exists:', error);
-                // Hier können Sie Fehler behandeln, z. B. eine Fehlermeldung anzeigen
-                alert('Registration failed. User ' + '"' + email + '"' + ' already exists');
-            });
 
     }
 
@@ -66,32 +53,57 @@ export const Dashboard = ({ props, onLogout, onFormSwitch, userInfo }) => {
     };
 
 
+    // return (
+    //     <><div className="auth-form-container">
+    //         <h2>Dashboard</h2>
+    //         <form className="dashboard-form">
+    //             <label htmlFor="email">Email:</label>
+    //             <input type="email" id="email" name="email" value={email} readOnly />
+    //             <label htmlFor="firstName">First Name:</label>
+    //             <input type="text" id="firstName" name="firstName" value={firstName} readOnly />
+    //             <label htmlFor="lastName">Last Name:</label>
+    //             <input type="text" id="lastName" name="lastName" value={lastName} readOnly />
+    //             <label htmlFor="company">Company:</label>
+    //             <input type="text" id="company" name="company" value={company} readOnly />
+    //             <label htmlFor="phoneNumber">Phone Number:</label>
+    //             <input type="text" id="phoneNumber" name="phoneNumber" value={phoneNumber} readOnly />
+    //         </form>
+    //         <button onClick={() => handleUserSettings('UserSettings')}>Update User Info</button>
+    //         <button onClick={() => handleFormSwitch('changePassword')}>Change Password</button>
+    //     </div>
+    //         <div className="logout-button">
+    //             <button onClick={handleLogout}>Logout</button>
+    //         </div></>
+    // )
+
     return (
-        <div className="auth-form-container">
-            <h2>Welcome to your Dashboard</h2>
-            <form className="dashboard-form">
-                <label htmlFor="email">Email:</label>
-                <input type="email" id="email" name="email" value={email} readOnly />
+        <>
+            {currentForm === "UserSettings" ? (
+                <UserSettings onFormSwitch={toggleForm} handleUserSettings={handleUserSettings} />
+            ) : (
+                <div className="auth-form-container">
+                    <h2>Dashboard</h2>
+                    <form className="dashboard-form">
+                        <label htmlFor="email">Email:</label>
+                        <input type="email" id="email" name="email" value={email} readOnly />
+                        <label htmlFor="firstName">First Name:</label>
+                        <input type="text" id="firstName" name="firstName" value={firstName} readOnly />
+                        <label htmlFor="lastName">Last Name:</label>
+                        <input type="text" id="lastName" name="lastName" value={lastName} readOnly />
+                        <label htmlFor="company">Company:</label>
+                        <input type="text" id="company" name="company" value={company} readOnly />
+                        <label htmlFor="phoneNumber">Phone Number:</label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" value={phoneNumber} readOnly />
+                    </form>
+                    <button onClick={() => toggleForm("UserSettings")}>Update User Info</button>
+                    <button onClick={() => toggleForm("changePassword")}>Change Password</button>
+                </div>
+            )}
 
-                <label htmlFor="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" value={firstName} readOnly />
+            <div className="logout-button">
+                <button onClick={handleLogout}>Logout</button>
+            </div>
+        </>
+    );
 
-                <label htmlFor="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" value={lastName} readOnly />
-
-                <label htmlFor="company">Company:</label>
-                <input type="text" id="company" name="company" value={company} readOnly />
-
-                <label htmlFor="phoneNumber">Phone Number:</label>
-                <input type="text" id="phoneNumber" name="phoneNumber" value={phoneNumber} readOnly />
-            </form>
-            <button onClick={handleLogout}>Logout</button>
-            <button onClick={() => handleFormSwitch('updateUserInfo')}>
-                Update User Info
-            </button>
-            <button onClick={() => handleFormSwitch('changePassword')}>
-                Change Password
-            </button>
-        </div>
-    )
 }
