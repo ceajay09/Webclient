@@ -1,6 +1,7 @@
 package com.example.myproject.controller;
 
 import com.example.myproject.repository.Account;
+import com.example.myproject.repository.Token;
 import com.example.myproject.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,8 @@ public class RequestHandler {
 
     private static final Logger logger = LogManager.getLogger(RequestHandler.class);
 
-    private final Key key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+    // private final Key key =
+    // Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
 
     @Autowired
     private AccountRepository accountRepository;
@@ -99,7 +101,9 @@ public class RequestHandler {
                 String responseMessage = account.getEmail() + " Correct login credentials";
                 logger.info("Registration response: {}", responseMessage);
 
-                String token = this.createToken(account.getID().toString());
+                String token = Token.createToken(account.getID().toString());
+
+                // String token = this.createToken(account.getID().toString());
 
                 JSONObject responseObject = new JSONObject();
                 responseObject.put("status", "success");
@@ -122,6 +126,18 @@ public class RequestHandler {
         }
     }
 
+    @PostMapping(path = "/api/logout", produces = "application/json")
+    public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String token) {
+        // Log the request
+        logger.info("Received logout request TODO: email={}",
+                token);
+
+        JSONObject responseObject = new JSONObject();
+        responseObject.put("status", "success");
+        responseObject.put("message", "Logout successful");
+        return ResponseEntity.ok().body(responseObject.toString());
+    }
+
     // Abrufen eines Benutzers nach ID.
     // @GetMapping("/{id}")
     @GetMapping(path = "api/account/{id}", produces = "application/json")
@@ -129,13 +145,15 @@ public class RequestHandler {
         return accountRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public String createToken(String accountID) {
-        Date expirationDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
-        String token = Jwts.builder()
-                .setSubject(accountID)
-                .setExpiration(expirationDate)
-                .signWith(key)
-                .compact();
-        return token;
-    }
+    // public String createToken(String accountID) {
+    // Date expirationDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 *
+    // 24);
+    // String token = Jwts.builder()
+    // .setSubject(accountID)
+    // .setExpiration(expirationDate)
+    // .signWith(key)
+    // .compact();
+    // return token;
+    // }
+
 }

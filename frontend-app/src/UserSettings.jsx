@@ -12,9 +12,9 @@ export const UserSettings = ({ props, onLogout, onFormSwitch, userInfo }) => {
 
     const handleLogout = () => {
         // Hier können Sie die Logik für die Abmeldung ausführen, z. B. das Löschen des Tokens aus dem Local Storage
-        console.log("Token : " + localStorage.getItem('token'))
-        localStorage.removeItem('token');
-        console.log("Token entfernt (null): " + localStorage.getItem('token'))
+        // console.log("Token : " + localStorage.getItem('token'))
+        // localStorage.removeItem('token');
+        // console.log("Token entfernt (null): " + localStorage.getItem('token'))
         onLogout();
     };
 

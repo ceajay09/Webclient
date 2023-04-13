@@ -32,16 +32,6 @@ function App() {
   return (
     <div className="App">
       {isLoggedIn ? (
-
-        // <Dashboard props={undefined} onLogout={handleLogout} userInfo={{
-        //   firstName: '',
-        //   lastName: '',
-        //   email: '',
-        //   company: '',
-        //   phoneNumber: ''
-        // }}
-        //  />
-
         <Dashboard onLogout={handleLogout} userInfo={{
           firstName: "",
           lastName: "",
