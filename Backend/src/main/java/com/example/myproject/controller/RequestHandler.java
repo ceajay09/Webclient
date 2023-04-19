@@ -9,22 +9,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Key;
-import java.util.Date;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import net.bytebuddy.asm.Advice.This;
+import com.example.myproject.model.MongoDBConnection;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
 // @RequestMapping("api/")
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class RequestHandler {
+
+    private final String ACCOUNTS_COLLECTION = "accounts";
 
     private static final Logger logger = LogManager.getLogger(RequestHandler.class);
 
@@ -59,7 +60,9 @@ public class RequestHandler {
             account.setPhoneNumber(phoneNumber);
 
             this.accountRepository.save(account);
+
             int accountID = this.accountRepository.findByEmail(account.getEmail()).getID();
+            this.saveAccountToDatabase(accountID);
 
             // Integer id = account.getID();
             System.out.println(account.getEmail() + " created / " + "ID = " + accountID);
@@ -143,6 +146,33 @@ public class RequestHandler {
     @GetMapping(path = "api/account/{id}", produces = "application/json")
     public Account getAccountById(@PathVariable Integer id) {
         return accountRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private void saveAccountToDatabase(Integer accountID) {
+        // TODO
+        Account account = accountRepository.findByID(accountID);
+        account.getCompany();
+        account.getEmail();
+        account.getFirstName();
+        account.getLastName();
+        account.getPhoneNumber();
+
+        MongoClient mongoClient = MongoDBConnection.getMongoClient();
+        MongoDatabase database = mongoClient.getDatabase("MongoDB");
+        MongoCollection<Document> collection = database.getCollection(ACCOUNTS_COLLECTION);
+
+        // Account-Daten in ein MongoDB-Dokument umwandeln
+        Document accountDoc = new Document();
+        accountDoc.append("accountID", accountID)
+                .append("email", account.getEmail())
+                .append("firstName", account.getFirstName())
+                .append("lastName", account.getLastName())
+                .append("phoneNumber", account.getLastName());
+        // .append("token", token);
+
+        // Dokument in der MongoDB speichern
+        collection.insertOne(accountDoc);
+        logger.info("Account saved in Database");
     }
 
     // public String createToken(String accountID) {
