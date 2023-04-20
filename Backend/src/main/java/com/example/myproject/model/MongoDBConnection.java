@@ -10,10 +10,14 @@ import org.bson.Document;
 
 public class MongoDBConnection {
 
-    public static MongoClient getMongoClient() {
+    public static MongoClient getMongoClient(String mongoConnection) {
         MongoClient mongoClient = null;
 
-        String connectionString = "mongodb+srv://cjaquiery:uyMOfIs6BtUwxWRr@mywebapp.pjxdzvf.mongodb.net/?retryWrites=true&w=majority";
+        String connectionString = mongoConnection + "@mywebapp.pjxdzvf.mongodb.net/?retryWrites=true&w=majority";
+
+        // String connectionString =
+        // "mongodb+srv://cjaquiery:uyMOfIs6BtUwxWRr@mywebapp.pjxdzvf.mongodb.net/?retryWrites=true&w=majority";
+
         ConnectionString connString = new ConnectionString(connectionString);
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connString)

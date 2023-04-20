@@ -20,9 +20,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+
 // @RequestMapping("api/")
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
+@PropertySource("classpath:application.properties")
 public class RequestHandler {
 
     private final String ACCOUNTS_COLLECTION = "accounts";
@@ -34,6 +38,9 @@ public class RequestHandler {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Value("${mongo.connection.string}")
+    private String mongoConnection;
 
     // Erstellen eines neuen Benutzers
     @PostMapping(path = "/api/register", produces = "application/json")
@@ -149,7 +156,6 @@ public class RequestHandler {
     }
 
     private void saveAccountToDatabase(Integer accountID) {
-        // TODO
         Account account = accountRepository.findByID(accountID);
         account.getCompany();
         account.getEmail();
@@ -157,7 +163,7 @@ public class RequestHandler {
         account.getLastName();
         account.getPhoneNumber();
 
-        MongoClient mongoClient = MongoDBConnection.getMongoClient();
+        MongoClient mongoClient = MongoDBConnection.getMongoClient(this.mongoConnection);
         MongoDatabase database = mongoClient.getDatabase("MongoDB");
         MongoCollection<Document> collection = database.getCollection(ACCOUNTS_COLLECTION);
 
@@ -168,22 +174,10 @@ public class RequestHandler {
                 .append("firstName", account.getFirstName())
                 .append("lastName", account.getLastName())
                 .append("phoneNumber", account.getLastName());
-        // .append("token", token);
 
         // Dokument in der MongoDB speichern
         collection.insertOne(accountDoc);
         logger.info("Account saved in Database");
     }
-
-    // public String createToken(String accountID) {
-    // Date expirationDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 *
-    // 24);
-    // String token = Jwts.builder()
-    // .setSubject(accountID)
-    // .setExpiration(expirationDate)
-    // .signWith(key)
-    // .compact();
-    // return token;
-    // }
 
 }
