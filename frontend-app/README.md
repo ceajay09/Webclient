@@ -1,5 +1,3 @@
-mongodb+srv://cjaquiery:uyMOfIs6BtUwxWRr@mywebapp.pjxdzvf.mongodb.net/test?retryWrites=true&w=majority
-mongodb://localhost:27017
 
 # Getting Started with Create React App
 

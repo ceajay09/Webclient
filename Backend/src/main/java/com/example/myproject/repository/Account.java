@@ -22,6 +22,10 @@ public class Account {
 		return ID;
 	}
 
+	public void setID(Integer ID) {
+		this.ID = ID;
+	}
+
 	public String getFirstName() {
 		return firstName;
 	}

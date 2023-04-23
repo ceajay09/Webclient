@@ -1,14 +1,71 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 
 export const UserSettings = ({ props, onLogout, onFormSwitch, userInfo }) => {
-    const [email, setEmail] = useState(userInfo ? userInfo.email : '');
-    const [password, setPassword] = useState(userInfo ? userInfo.password : '')
-    const [firstName, setFirstName] = useState(userInfo ? userInfo.firstName : '');
-    const [lastName, setLastName] = useState(userInfo ? userInfo.lastName : '');
-    const [company, setCompany] = useState(userInfo ? userInfo.company : '');
-    const [phoneNumber, setPhoneNumber] = useState(userInfo ? userInfo.phoneNumber : '');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [company, setCompany] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
 
+
+    const token = localStorage.getItem('token'); // Token aus dem Local Storage abrufen
+
+    // Fetch-Anfrage mit dem Token als Header
+    fetch('http://localhost:8080/api/data', {
+        headers: {
+            Authorization: `Bearer ${token}` // Token als Bearer-Token im Header senden
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Hier können Sie die Daten aus der Response weiterverarbeiten
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('email', data.email);
+            localStorage.setItem('firstName', data.firstName);
+            localStorage.setItem('lastName', data.lastName);
+            localStorage.setItem('company', data.company);
+            localStorage.setItem('phoneNumber', data.phoneNumber);
+            console.log('Data:', data);
+
+        })
+        .catch(error => {
+            // Hier können Sie Fehlerbehandlung durchführen
+            console.error('Error:', error);
+        });
+
+
+
+    useEffect(() => {
+        const storedEmail = localStorage.getItem('email');
+        const storedFirstName = localStorage.getItem('firstName');
+        const storedLastName = localStorage.getItem('lastName');
+        const storedCompany = localStorage.getItem('company');
+        const storedPhoneNumber = localStorage.getItem('phoneNumber');
+
+        // Überprüfen, ob die Werte im Local Storage vorhanden sind, bevor sie in den useState-Hooks gesetzt werden
+        if (storedEmail !== null && storedEmail !== undefined) {
+            setEmail(storedEmail);
+        }
+        if (storedFirstName !== null && storedFirstName !== undefined) {
+            setFirstName(storedFirstName);
+        }
+        if (storedLastName !== null && storedLastName !== undefined) {
+            setLastName(storedLastName);
+        }
+        if (storedCompany !== null && storedCompany !== undefined) {
+            setCompany(storedCompany);
+        }
+        if (storedPhoneNumber !== null && storedPhoneNumber !== undefined) {
+            setPhoneNumber(storedPhoneNumber);
+        }
+    }, []);
 
     const handleLogout = () => {
         // Hier können Sie die Logik für die Abmeldung ausführen, z. B. das Löschen des Tokens aus dem Local Storage

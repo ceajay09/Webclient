@@ -1,12 +1,9 @@
 package com.example.myproject;
 
-import com.example.myproject.model.MongoDBConnection;
 //import com.example.myproject.controller.AccountController;
 import com.example.myproject.repository.Account;
-import com.example.myproject.repository.Token;
 import com.example.myproject.repository.AccountRepository;
 import com.example.myproject.repository.SessionRepository;
-import com.example.myproject.repository.Token;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -27,7 +24,6 @@ public class Application {
         public static void main(String[] args) throws SQLException {
 
                 SpringApplication.run(Application.class, args);
-                // MongoDBConnection.getMongoClient();
 
         }
 

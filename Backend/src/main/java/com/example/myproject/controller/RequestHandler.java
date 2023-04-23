@@ -8,20 +8,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
-
-import com.example.myproject.model.MongoDBConnection;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import com.mongodb.client.MongoClients;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import java.nio.charset.StandardCharsets;
 
 // @RequestMapping("api/")
 @RestController
@@ -29,22 +35,31 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:application.properties")
 public class RequestHandler {
 
-    private final String ACCOUNTS_COLLECTION = "accounts";
-
     private static final Logger logger = LogManager.getLogger(RequestHandler.class);
 
-    // private final Key key =
-    // Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+    // @Value("${sharedSecret}")
+    // private static String sharedSecret;
 
-    @Autowired
-    private AccountRepository accountRepository;
+    // private static final String SECRET_KEY = sharedSecret; // Geheimer Schlüssel
+    // für die Signatur
+    // private static final byte[] SECRET_KEY_BYTES =
+    // SECRET_KEY.getBytes(StandardCharsets.UTF_8); // Secret Key als
+    // // Byte-Array
 
     @Value("${mongo.connection.string}")
     private String mongoConnection;
 
+    private final String ACCOUNTS_COLLECTION = "accounts";
+    private boolean alreadyExecuted;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     // Erstellen eines neuen Benutzers
     @PostMapping(path = "/api/register", produces = "application/json")
     public ResponseEntity<String> registerUser(@RequestBody Map<String, String> request) {
+        this.retrieveAllAccountsAndSaveToRepository(accountRepository);
+
         String email = request.get("email");
         String password = request.get("password");
         String firstName = request.get("firstName");
@@ -95,6 +110,7 @@ public class RequestHandler {
 
     @PostMapping(path = "/api/login", produces = "application/json")
     public ResponseEntity<String> loginUser(@RequestBody Map<String, String> request) {
+        this.retrieveAllAccountsAndSaveToRepository(accountRepository);
         String email = request.get("email");
         String password = request.get("password");
 
@@ -111,7 +127,7 @@ public class RequestHandler {
                 String responseMessage = account.getEmail() + " Correct login credentials";
                 logger.info("Registration response: {}", responseMessage);
 
-                String token = Token.createToken(account.getID().toString());
+                String token = Token.createToken(account.getEmail());
 
                 // String token = this.createToken(account.getID().toString());
 
@@ -119,6 +135,13 @@ public class RequestHandler {
                 responseObject.put("status", "success");
                 responseObject.put("message", "Login correct");
                 responseObject.put("token", token);
+                // responseObject.put("company", account.getCompany());
+                // responseObject.put("email", account.getEmail());
+                // responseObject.put("firstName", account.getFirstName());
+                // responseObject.put("ID", account.getID());
+                // responseObject.put("lastName", account.getLastName());
+                // responseObject.put("password", account.getPassword());
+                // responseObject.put("phoneNumber", account.getPhoneNumber());
                 return ResponseEntity.ok().body(responseObject.toString());
 
                 // return ResponseEntity.ok()
@@ -157,13 +180,8 @@ public class RequestHandler {
 
     private void saveAccountToDatabase(Integer accountID) {
         Account account = accountRepository.findByID(accountID);
-        account.getCompany();
-        account.getEmail();
-        account.getFirstName();
-        account.getLastName();
-        account.getPhoneNumber();
 
-        MongoClient mongoClient = MongoDBConnection.getMongoClient(this.mongoConnection);
+        MongoClient mongoClient = this.getMongoClient(this.mongoConnection);
         MongoDatabase database = mongoClient.getDatabase("MongoDB");
         MongoCollection<Document> collection = database.getCollection(ACCOUNTS_COLLECTION);
 
@@ -171,13 +189,138 @@ public class RequestHandler {
         Document accountDoc = new Document();
         accountDoc.append("accountID", accountID)
                 .append("email", account.getEmail())
+                .append("password", account.getPassword())
                 .append("firstName", account.getFirstName())
                 .append("lastName", account.getLastName())
                 .append("phoneNumber", account.getLastName());
 
         // Dokument in der MongoDB speichern
         collection.insertOne(accountDoc);
-        logger.info("Account saved in Database");
+        logger.info(account.getID() + " saved in Database");
+        mongoClient.close();
+    }
+
+    @RequestMapping(value = "/api/data", method = RequestMethod.GET)
+    public ResponseEntity<?> getData(HttpServletRequest request) {
+        // Token aus dem Authorization-Header der Anfrage erhalten
+        String token = request.getHeader("Authorization");
+
+        // Token validieren (z.B. mit einer JWT-Bibliothek)
+        if (Token.isValidToken(token)) {
+            // Token ist gültig, Daten zurückgeben
+            Account account = getAccountFromToken(token); // Annahme: Methode, um Account-Daten aus dem Token zu
+                                                          // extrahieren
+            if (account != null) {
+                // Account-Daten erfolgreich abgerufen, als JSON-Response zurückgeben
+                JSONObject responseObject = new JSONObject();
+                responseObject.put("status", "success");
+                responseObject.put("company", account.getCompany());
+                responseObject.put("email", account.getEmail());
+                responseObject.put("firstName", account.getFirstName());
+                responseObject.put("ID", account.getID());
+                responseObject.put("lastName", account.getLastName());
+                responseObject.put("password", account.getPassword());
+                responseObject.put("phoneNumber", account.getPhoneNumber());
+                responseObject.put("account", account); // Account-Daten im Response-Objekt speichern
+                logger.info(account.getID() + " transfered to Frontend");
+                return ResponseEntity.ok().body(responseObject.toString());
+            }
+        } else {
+            logger.warn("getAccountFromToken: Token invalid:" + token);
+        }
+
+        // Token ist ungültig, Fehlermeldung zurückgeben
+        JSONObject responseObject = new JSONObject();
+        responseObject.put("status", "error");
+        responseObject.put("message", "Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseObject.toString());
+    }
+
+    public void retrieveAllAccountsAndSaveToRepository(AccountRepository accountRepository) {
+        if (alreadyExecuted == false) {
+            // Verbindung zur MongoDB-Datenbank herstellen
+            MongoClient mongoClient = this.getMongoClient(mongoConnection);
+            MongoDatabase database = mongoClient.getDatabase("MongoDB");
+            MongoCollection<Document> collection = database.getCollection(ACCOUNTS_COLLECTION);
+
+            // Alle Dokumente in der Collection abrufen
+            FindIterable<Document> documents = collection.find();
+
+            // Durch alle Dokumente iterieren und Accounts erstellen und auf dem
+            // AccountRepository speichern
+            for (Document doc : documents) {
+                Integer accountId = doc.getInteger("accountID");
+                String email = doc.getString("email");
+                String password = doc.getString("password");
+                String firstName = doc.getString("firstName");
+                String lastName = doc.getString("lastName");
+                String phoneNumber = doc.getString("phoneNumber");
+
+                Account account = new Account();
+                account.setID(accountId);
+                account.setEmail(email);
+                account.setPassword(password);
+                account.setFirstName(firstName);
+                account.setLastName(lastName);
+                account.setPhoneNumber(phoneNumber);
+
+                accountRepository.save(account);
+                logger.info("ID-Account " + account.getID() + " saved in Database");
+            }
+            logger.info("Accounts retrieved from Database");
+
+            // MongoDB-Verbindung schließen
+            mongoClient.close();
+            alreadyExecuted = true;
+        } else {
+            logger.warn("Accounts retrieved already from Database");
+        }
+    }
+
+    private MongoClient getMongoClient(String mongoConnection) {
+        MongoClient mongoClient = null;
+
+        String connectionString = mongoConnection + "@mywebapp.pjxdzvf.mongodb.net/?retryWrites=true&w=majority";
+
+        // Create a new client and connect to the server
+        try {
+            ConnectionString connString = new ConnectionString(connectionString);
+            MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(connString)
+                    .build();
+            // Send a ping to confirm a successful connection
+            mongoClient = MongoClients.create(settings);
+            // MongoDatabase database = mongoClient.getDatabase("MongoDB");
+            // database.runCommand(new Document("ping", 1));
+            // System.out.println("Pinged your deployment. You successfully connected to
+            // MongoDB!");
+        } catch (MongoException e) {
+            e.printStackTrace();
+        }
+        return mongoClient;
+    }
+
+    public Account getAccountFromToken(String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            // Token parsen und Claims (Daten) auslesen
+            Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(Token.getKey()).build()
+                    .parseClaimsJws(token);
+            Claims claims = jws.getBody();
+            String email = claims.getSubject();
+
+            return this.accountRepository.findByEmail(email);
+        } catch (Exception e) {
+            // Bei Fehler oder ungültigem Token wird eine Exception geworfen
+            logger.warn("getAccountFromToken" + e);
+            return null;
+        }
+    }
+
+    public void setAlreadyExecuted(boolean alreadyExecuted) {
+        this.alreadyExecuted = alreadyExecuted;
     }
 
 }
