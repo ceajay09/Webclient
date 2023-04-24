@@ -12,59 +12,72 @@ export const UserSettings = ({ props, onLogout, onFormSwitch, userInfo }) => {
 
     const token = localStorage.getItem('token'); // Token aus dem Local Storage abrufen
 
-    // Fetch-Anfrage mit dem Token als Header
-    fetch('http://localhost:8080/api/data', {
-        headers: {
-            Authorization: `Bearer ${token}` // Token als Bearer-Token im Header senden
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Hier können Sie die Daten aus der Response weiterverarbeiten
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('email', data.email);
-            localStorage.setItem('firstName', data.firstName);
-            localStorage.setItem('lastName', data.lastName);
-            localStorage.setItem('company', data.company);
-            localStorage.setItem('phoneNumber', data.phoneNumber);
-            console.log('Data:', data);
+    const getUserData = () => {  //
+        handleReset()
+        const token = localStorage.getItem('token');
 
+        // Fetch-Anfrage mit dem Token als Header
+        fetch('http://localhost:8080/api/data', {
+            headers: {
+                Authorization: `Bearer ${token}` // Token als Bearer-Token im Header senden
+            }
         })
-        .catch(error => {
-            // Hier können Sie Fehlerbehandlung durchführen
-            console.error('Error:', error);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hier können Sie die Daten aus der Response weiterverarbeiten
+                // localStorage.setItem('token', data.token);
+                // localStorage.setItem('email', data.email);
+                // localStorage.setItem('firstName', data.firstName);
+                // localStorage.setItem('lastName', data.lastName);
+                // localStorage.setItem('company', data.company);
+                // localStorage.setItem('phoneNumber', data.phoneNumber);
+                setEmail(data.email);
+                setFirstName(data.firstName);
+                setLastName(data.lastName);
+                setCompany(data.company);
+                setPhoneNumber(data.phoneNumber);
+                console.log('Data:', data);
+
+            })
+            .catch(error => {
+                // Hier können Sie Fehlerbehandlung durchführen
+                console.error('Error:', error);
+            });
+    }
 
 
 
     useEffect(() => {
-        const storedEmail = localStorage.getItem('email');
-        const storedFirstName = localStorage.getItem('firstName');
-        const storedLastName = localStorage.getItem('lastName');
-        const storedCompany = localStorage.getItem('company');
-        const storedPhoneNumber = localStorage.getItem('phoneNumber');
+        handleReset()
+        getUserData()
+
+        // const storedEmail = localStorage.getItem('email');
+        // const storedFirstName = localStorage.getItem('firstName');
+        // const storedLastName = localStorage.getItem('lastName');
+        // const storedCompany = localStorage.getItem('company');
+        // const storedPhoneNumber = localStorage.getItem('phoneNumber');
 
         // Überprüfen, ob die Werte im Local Storage vorhanden sind, bevor sie in den useState-Hooks gesetzt werden
-        if (storedEmail !== null && storedEmail !== undefined) {
-            setEmail(storedEmail);
-        }
-        if (storedFirstName !== null && storedFirstName !== undefined) {
-            setFirstName(storedFirstName);
-        }
-        if (storedLastName !== null && storedLastName !== undefined) {
-            setLastName(storedLastName);
-        }
-        if (storedCompany !== null && storedCompany !== undefined) {
-            setCompany(storedCompany);
-        }
-        if (storedPhoneNumber !== null && storedPhoneNumber !== undefined) {
-            setPhoneNumber(storedPhoneNumber);
-        }
+        // if (storedEmail !== null && storedEmail !== undefined) {
+        //     setEmail(storedEmail);
+        // }
+        // if (storedFirstName !== null && storedFirstName !== undefined) {
+        //     setFirstName(storedFirstName);
+        // }
+        // if (storedLastName !== null && storedLastName !== undefined) {
+        //     setLastName(storedLastName);
+        // }
+        // if (storedCompany !== null && storedCompany !== undefined) {
+        //     setCompany(storedCompany);
+        // }
+        // if (storedPhoneNumber !== null && storedPhoneNumber !== undefined) {
+        //     setPhoneNumber(storedPhoneNumber);
+        // }
     }, []);
 
     const handleLogout = () => {

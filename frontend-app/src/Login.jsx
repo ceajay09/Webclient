@@ -45,21 +45,6 @@ export const Login = (props) => {
                 // Hier können Sie Fehler behandeln, z. B. eine Fehlermeldung anzeigen
                 alert('Login failed. Please check your email and password.');
             });
-
-        // const token = localStorage.getItem('token'); //Login-Token abrufen bei späteren abfragen
-        // fetch('http://localhost:8080/api/data', {
-        //     method: 'GET',
-        //     headers: {
-        //         'Authorization': `Bearer ${token}`
-        //     }
-        // })
-        //     .then(response => {
-        //         // ...
-        //     })
-        //     .catch(error => {
-        //         // ...
-        //     });
-
     }
 
     return (
