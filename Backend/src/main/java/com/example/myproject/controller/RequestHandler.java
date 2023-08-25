@@ -181,23 +181,28 @@ public class RequestHandler {
     private void saveAccountToDatabase(Integer accountID) {
         Account account = accountRepository.findByID(accountID);
 
-        MongoClient mongoClient = this.getMongoClient(this.mongoConnection);
-        MongoDatabase database = mongoClient.getDatabase("MongoDB");
-        MongoCollection<Document> collection = database.getCollection(ACCOUNTS_COLLECTION);
+        try {
+            MongoClient mongoClient = this.getMongoClient(this.mongoConnection);
+            MongoDatabase database = mongoClient.getDatabase("MongoDB");
+            MongoCollection<Document> collection = database.getCollection(ACCOUNTS_COLLECTION);
 
-        // Account-Daten in ein MongoDB-Dokument umwandeln
-        Document accountDoc = new Document();
-        accountDoc.append("accountID", accountID)
-                .append("email", account.getEmail())
-                .append("password", account.getPassword())
-                .append("firstName", account.getFirstName())
-                .append("lastName", account.getLastName())
-                .append("phoneNumber", account.getLastName());
+            // Account-Daten in ein MongoDB-Dokument umwandeln
+            Document accountDoc = new Document();
+            accountDoc.append("accountID", accountID)
+                    .append("email", account.getEmail())
+                    .append("password", account.getPassword())
+                    .append("firstName", account.getFirstName())
+                    .append("lastName", account.getLastName())
+                    .append("phoneNumber", account.getLastName());
 
-        // Dokument in der MongoDB speichern
-        collection.insertOne(accountDoc);
-        logger.info(account.getID() + " saved in Database");
-        mongoClient.close();
+            // Dokument in der MongoDB speichern
+            collection.insertOne(accountDoc);
+            logger.info(account.getID() + " saved in Database");
+            mongoClient.close();
+        } catch (Exception e) {
+            logger.warn("Verbindung mit MongoDB fehlgeschalgen " + e);
+        }
+
     }
 
     @RequestMapping(value = "/api/data", method = RequestMethod.GET)
@@ -295,6 +300,7 @@ public class RequestHandler {
             // System.out.println("Pinged your deployment. You successfully connected to
             // MongoDB!");
         } catch (MongoException e) {
+            logger.warn("Verbindung mit MongoDB fehlgeschalgen " + e);
             e.printStackTrace();
         }
         return mongoClient;

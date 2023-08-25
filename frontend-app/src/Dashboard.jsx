@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { UserSettings } from "./UserSettings";
 import { sendLogout } from './Logout';
 
-export const Dashboard = ({ props, onLogout, onFormSwitch, userInfo }) => {
+export const Dashboard = ({ onLogout, onFormSwitch, userInfo }) => {
     const [currentForm, setCurrentForm] = useState('Dashboard');
     const [email, setEmail] = useState(userInfo.email);
     const [password, setPassword] = useState(userInfo.password);

@@ -8,37 +8,57 @@ import { Register } from "./Register";
 import { Dashboard } from "./Dashboard";
 // const logger = log4js.getLogger('React-Logger');
 
-function App() {
-  const [currentForm, setCurrentForm] = useState('login');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+// Definieren Sie die Struktur der Benutzerinformationen
+interface UserInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  company: string;
+  phoneNumber: string;
+}
 
-  const toggleForm = (formName: string) => {
+const App: React.FC = () => {
+  const [currentForm, setCurrentForm] = useState<string>('login'); // Typ hinzugefügt
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // Typ hinzugefügt
+
+  const toggleForm = (formName: string): void => { // Typ hinzugefügt
     setCurrentForm(formName);
   }
 
-  const handleLogin = () => {
+  // function App() {
+  //   const [currentForm, setCurrentForm] = useState('login');
+  //   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  //   const toggleForm = (formName: string) => {
+  //     setCurrentForm(formName);
+  //   }
+
+  const handleLogin = (): void => { // Typ hinzugefügt
     console.log("handleLogin called");
     setIsLoggedIn(true);
     setCurrentForm("dashboard");
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => { // Typ hinzugefügt
     console.log("handleLogout called");
     setIsLoggedIn(false);
     setCurrentForm("login");
     return;
   };
 
+  // Initialisieren Sie die userInfo-Struktur für den Anfangszustand
+  const initialUserInfo: UserInfo = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    company: "",
+    phoneNumber: "",
+  }
+
   return (
     <div className="App">
       {isLoggedIn ? (
-        <Dashboard onLogout={handleLogout} userInfo={{
-          firstName: "",
-          lastName: "",
-          email: "",
-          company: "",
-          phoneNumber: "",
-        }} props={undefined} onFormSwitch={undefined} /> // TODO onformswitch hier evt falsch
+        <Dashboard onLogout={handleLogout} userInfo={initialUserInfo} onFormSwitch={toggleForm} /> //Todo: "props={undefined}"" entfernen sobald in Dashboard usersettings und login entfernt wurde
       ) : (
         <>
           {currentForm === "login" ? (

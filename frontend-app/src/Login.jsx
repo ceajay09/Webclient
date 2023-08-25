@@ -28,11 +28,7 @@ export const Login = (props) => {
                 // Hier können Sie die weitere Logik ausführen, z. B. den Benutzer zur Dashboard-Seite weiterleiten
                 localStorage.clear();
                 localStorage.setItem('token', data.token);
-                // localStorage.setItem('email', data.email);
-                // localStorage.setItem('firstName', data.firstName);
-                // localStorage.setItem('lastName', data.lastName);
-                // localStorage.setItem('company', data.company);
-                // localStorage.setItem('phoneNumber', data.phoneNumber);
+
 
                 alert("token: " + localStorage.getItem('token')); // Token im Local Storage speichern
                 props.handleLogin()

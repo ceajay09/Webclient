@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 
-export const UserSettings = ({ props, onLogout, onFormSwitch, userInfo }) => {
+export const UserSettings = ({ onLogout, onFormSwitch, userInfo }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState('');
@@ -55,29 +55,6 @@ export const UserSettings = ({ props, onLogout, onFormSwitch, userInfo }) => {
     useEffect(() => {
         handleReset()
         getUserData()
-
-        // const storedEmail = localStorage.getItem('email');
-        // const storedFirstName = localStorage.getItem('firstName');
-        // const storedLastName = localStorage.getItem('lastName');
-        // const storedCompany = localStorage.getItem('company');
-        // const storedPhoneNumber = localStorage.getItem('phoneNumber');
-
-        // Überprüfen, ob die Werte im Local Storage vorhanden sind, bevor sie in den useState-Hooks gesetzt werden
-        // if (storedEmail !== null && storedEmail !== undefined) {
-        //     setEmail(storedEmail);
-        // }
-        // if (storedFirstName !== null && storedFirstName !== undefined) {
-        //     setFirstName(storedFirstName);
-        // }
-        // if (storedLastName !== null && storedLastName !== undefined) {
-        //     setLastName(storedLastName);
-        // }
-        // if (storedCompany !== null && storedCompany !== undefined) {
-        //     setCompany(storedCompany);
-        // }
-        // if (storedPhoneNumber !== null && storedPhoneNumber !== undefined) {
-        //     setPhoneNumber(storedPhoneNumber);
-        // }
     }, []);
 
     const handleLogout = () => {
@@ -115,7 +92,7 @@ export const UserSettings = ({ props, onLogout, onFormSwitch, userInfo }) => {
             <h2>User Settings</h2>
             <form className="dashboard-form">
                 <label htmlFor="email">Email:</label>
-                <input type="email" id="email" name="email" value={email} readOnly />
+                <input type="email" id="email" name="email" value={email} />
                 <label htmlFor="firstName">First Name:</label>
                 <input type="text" id="firstName" name="firstName" value={firstName} readOnly />
                 <label htmlFor="lastName">Last Name:</label>
