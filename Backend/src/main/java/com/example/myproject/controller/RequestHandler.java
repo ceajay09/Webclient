@@ -1,13 +1,18 @@
 package com.example.myproject.controller;
 
+import com.example.myproject.controller.RabbitMQ.ReceiveFromQueue;
 import com.example.myproject.repository.Account;
-import com.example.myproject.repository.Token;
+
 import com.example.myproject.repository.AccountRepository;
+import com.example.myproject.repository.Token;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
@@ -54,6 +59,9 @@ public class RequestHandler {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private ReceiveFromQueue receiveFromQueue;
 
     // Erstellen eines neuen Benutzers
     @PostMapping(path = "/api/register", produces = "application/json")
@@ -178,6 +186,15 @@ public class RequestHandler {
         return accountRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    // @GetMapping("/api/videoData")
+    // public ResponseEntity<Map<String, String>> getVideoData() {
+    // Map<String, String> videoData = new HashMap<>();
+    // videoData.put("videoUrl",
+    // "http://streamingProjektServer:Port/video/titelDesVideos");
+
+    // return ResponseEntity.ok(videoData);
+    // }
+
     private void saveAccountToDatabase(Integer accountID) {
         Account account = accountRepository.findByID(accountID);
 
@@ -205,7 +222,8 @@ public class RequestHandler {
 
     }
 
-    @RequestMapping(value = "/api/data", method = RequestMethod.GET)
+    // @RequestMapping(value = "/api/data", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/dashboard", method = RequestMethod.GET)
     public ResponseEntity<?> getData(HttpServletRequest request) {
         // Token aus dem Authorization-Header der Anfrage erhalten
         String token = request.getHeader("Authorization");

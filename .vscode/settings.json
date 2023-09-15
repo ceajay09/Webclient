@@ -1,6 +1,9 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.configuration.updateBuildConfiguration": "automatic",
     "java.compile.nullAnalysis.mode": "automatic",
     "maven.view": "flat",
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.project.sourcePaths": [
+        "Streaming"
+    ]
 }

@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "demo.src.main.java.demo.src.main.java.com.example.Main",
+            "projectName": "Streaming_6a0e2817"
+        },
+        {
+            "type": "java",
+            "name": "SpringwebfluxVideoStreamingApplication",
+            "request": "launch",
+            "mainClass": "demo.src.main.java.demo.src.main.java.com.example.SpringwebfluxVideoStreamingApplication",
+            "projectName": "Streaming_6a0e2817"
+        },
+        {
+            "type": "java",
+            "name": "Main(1)",
+            "request": "launch",
+            "mainClass": "demo.src.main.java.com.example.Main",
+            "projectName": "my-app"
+        },
+        {
+            "type": "java",
+            "name": "SpringwebfluxVideoStreamingApplication(1)",
+            "request": "launch",
+            "mainClass": "demo.src.main.java.com.example.SpringwebfluxVideoStreamingApplication",
+            "projectName": "my-app"
+        }
+    ]
+}

@@ -8,10 +8,13 @@ import com.example.myproject.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
+
 import java.sql.SQLException;
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication
+@EnableAsync
 public class Application {
 
         // @Autowired

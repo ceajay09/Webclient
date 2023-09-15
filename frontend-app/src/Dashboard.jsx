@@ -11,12 +11,14 @@ export const Dashboard = ({ onLogout, onFormSwitch, userInfo }) => {
     const [company, setCompany] = useState(userInfo.company);
     const [phoneNumber, setPhoneNumber] = useState(userInfo.phoneNumber);
 
+    const [videoUrl, setVideoUrl] = useState(null);
+
     const getUserData = () => {  //
         handleReset()
         const token = localStorage.getItem('token');
 
         // Fetch-Anfrage mit dem Token als Header
-        fetch('http://localhost:8080/api/data', {
+        fetch('http://localhost:8080/api/dashboard', {
             headers: {
                 Authorization: `Bearer ${token}` // Token als Bearer-Token im Header senden
             }
@@ -47,7 +49,30 @@ export const Dashboard = ({ onLogout, onFormSwitch, userInfo }) => {
                 // Hier können Sie Fehlerbehandlung durchführen
                 console.error('Error:', error);
             });
+
+        fetch('http://localhost:8080/api/videoData', {
+            headers: {
+                Authorization: `Bearer ${token}` // Token als Bearer-Token im Header senden
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setVideoUrl(data.videoUrl);
+
+            })
+            .catch(error => {
+                // Hier können Sie Fehlerbehandlung durchführen
+                console.error('Error:', error);
+            });
     }
+
+
+
 
     const handleLogout = () => {
         // Hier können Sie die Logik für die Abmeldung ausführen, z. B. das Löschen des Tokens aus dem Local Storage
@@ -99,9 +124,13 @@ export const Dashboard = ({ onLogout, onFormSwitch, userInfo }) => {
                         <input type="text" id="company" name="company" value={company} readOnly />
                         <label htmlFor="phoneNumber">Phone Number:</label>
                         <input type="text" id="phoneNumber" name="phoneNumber" value={phoneNumber} readOnly />
+                        <label htmlFor="video">Video:</label>
+                        <input type="text" id="video" name="video" value={phoneNumber} readOnly />
+                        <video src="Streaming\demo\src\main\resources\videos" width="720" height="480" controls preload="none"></video>
                     </form>
                     {/* <button onClick={() => { toggleForm("UserSettings"); getUserData() }}>Update User Info</button> */}
                     <button onClick={() => toggleForm("UserSettings")}>Update User Info</button>
+                    <button onClick={() => toggleForm("Stream")}>Stream</button>
                     <button onClick={() => toggleForm("changePassword")}>Change Password</button>
                 </div>
             )}

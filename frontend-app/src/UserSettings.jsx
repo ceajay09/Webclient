@@ -17,7 +17,7 @@ export const UserSettings = ({ onLogout, onFormSwitch, userInfo }) => {
         const token = localStorage.getItem('token');
 
         // Fetch-Anfrage mit dem Token als Header
-        fetch('http://localhost:8080/api/data', {
+        fetch('http://localhost:8080/api/dashboard', {
             headers: {
                 Authorization: `Bearer ${token}` // Token als Bearer-Token im Header senden
             }
@@ -104,6 +104,7 @@ export const UserSettings = ({ onLogout, onFormSwitch, userInfo }) => {
             </form>
             <button onClick={() => handleFormSwitch('changePassword')}>Update user info</button>
             <button onClick={() => handleFormSwitch('updateUserInfo')}>Dashboard</button>
+            <button onClick={() => handleFormSwitch('Stream')}>Stream</button>
         </div>
             <div className="logout-button">
                 <button onClick={handleLogout}>Logout</button>
