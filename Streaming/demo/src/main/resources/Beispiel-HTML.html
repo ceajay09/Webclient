@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Test</title>
+</head>
+<body>
+
+<video controls id="videoElement" width="600" type="video/mp4"></video>
+<input type="range" min="0" max="100" value="0" id="seekSlider" step="1" style="width: 600px; display: block; margin: 10px auto;" />
+
+<script>
+  let videoElement = document.getElementById('videoElement');
+  let seekSlider = document.getElementById('seekSlider');
+
+  let videoDuration;
+  let fileSize;
+
+  videoElement.addEventListener('loadedmetadata', async () => {
+    videoDuration = videoElement.duration;
+    
+    const response = await fetch('http://localhost:8081/api/video/Krypto_T1_V2', {
+      method: 'HEAD',
+      headers: {
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE2OTUxMTQyNTR9.z0uoJE5NCnqt54P56UWMwZvfdWEXlAmA3TEDZvaRy1M'
+      }
+    });
+    
+    fileSize = response.headers.get('Content-Length');
+
+    seekSlider.addEventListener('change', () => {
+      let seekTime = (seekSlider.value / 100) * videoDuration;
+      let startRange = Math.floor((seekTime / videoDuration) * fileSize);
+      let endRange = fileSize - 1;
+      fetchSegment(startRange, endRange);
+      videoElement.currentTime = seekTime;
+    });
+  });
+
+  async function fetchSegment(startRange, endRange) {
+    try {
+      const response = await fetch('http://localhost:8081/api/video/Krypto_T1_V2', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE2OTUxMTQyNTR9.z0uoJE5NCnqt54P56UWMwZvfdWEXlAmA3TEDZvaRy1M',
+          'Range': `bytes=${startRange}-${endRange}`
+        }
+      });
+
+      if (response.status === 206) {
+        const blob = await response.blob();
+        videoElement.src = URL.createObjectURL(blob);
+      } else {
+        console.error('Failed to fetch video: ', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching video: ', error);
+    }
+  }
+
+  fetchSegment(0, 2000000); // Initial call to load the video
+</script>
+</body>
+</html>

@@ -2,8 +2,6 @@ package demo.src.main.java.com.example.RabbitMQ;
 
 import com.rabbitmq.client.ConnectionFactory;
 
-import demo.src.main.java.com.example.SpringwebfluxVideoStreamingApplication;
-
 import com.rabbitmq.client.Connection;
 
 import java.io.IOException;
@@ -13,7 +11,6 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import com.rabbitmq.client.Channel;
