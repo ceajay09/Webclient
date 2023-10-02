@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { UserSettings } from "./UserSettings";
 import { sendLogout } from './Logout';
+import { Stream } from "./Stream";
 
 export const Dashboard = ({ onLogout, onFormSwitch, userInfo }) => {
     const [currentForm, setCurrentForm] = useState('Dashboard');
@@ -110,6 +111,8 @@ export const Dashboard = ({ onLogout, onFormSwitch, userInfo }) => {
         <>
             {currentForm === "UserSettings" ? (
                 <UserSettings onFormSwitch={toggleForm} handleUserSettings={handleUserSettings} />
+            ) : currentForm === "Stream" ? (
+                <Stream onFormSwitch={toggleForm} />
             ) : (
                 <div className="auth-form-container">
                     <h2>Dashboard</h2>

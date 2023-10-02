@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import demo.src.main.java.com.example.repository.VideoRepository;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,49 +26,63 @@ public class StreamingService {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    public ResponseEntity<byte[]> prepareContent(String title, String fileType, String range) {
-        try {
-            Resource resource = resourceLoader.getResource("file:" + PATH + title + "." +
-                    fileType);
-            if (resource.exists()) {
-                File file = resource.getFile();
-                long fileSize = file.length();
+    public ServiceResponse getVideoFragment(String title, String fileType, String range)
+            throws IOException, FileNotFoundException {
+        Resource resource = resourceLoader.getResource("file:" + PATH + title + "." +
+                fileType);
+        if (resource.exists()) {
+            File file = resource.getFile();
+            long fileSize = file.length();
 
-                // Range-Header-Parsing und Bestimmung der Bytebereiche
-                String[] ranges = range.replace("bytes=", "").split("-");
-                long startRange = Long.parseLong(ranges[0]);
-                long endRange = ranges.length > 1 && !ranges[1].isEmpty() ? Long.parseLong(ranges[1]) : fileSize - 1;
+            // Range-Header-Parsing und Bestimmung der Bytebereiche
+            String[] ranges = range.replace("bytes=", "").split("-");
+            long startRange = Long.parseLong(ranges[0]);
+            long endRange = ranges.length > 1 && !ranges[1].isEmpty() ? Long.parseLong(ranges[1]) : fileSize - 1;
 
-                // Überprüfen und Anpassen des Endbereichs
-                endRange = Math.min(endRange, fileSize - 1);
+            // Überprüfen und Anpassen des Endbereichs
+            endRange = Math.min(endRange, fileSize - 1);
 
-                // Dateiinhalt lesen
-                RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
-                byte[] content = new byte[(int) (endRange - startRange + 1)];
-                randomAccessFile.seek(startRange);
-                randomAccessFile.readFully(content);
-                randomAccessFile.close();
+            // Dateiinhalt lesen
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
+            byte[] content = new byte[(int) (endRange - startRange + 1)];
+            randomAccessFile.seek(startRange);
+            randomAccessFile.readFully(content);
+            randomAccessFile.close();
 
-                // // Erstellen der ResponseEntity mit den benötigten Headern
-                HttpHeaders headers = new HttpHeaders();
-                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                        .header("Content-Length", String.valueOf(content.length))
-                        .header("Content-Type", "video/" + "mp4")
-                        .header("Expires", "0")
-                        .header("Cache-Control", "no-cache, no-store")
-                        .header("Connection", "keep-alive")
-                        .header("Accept-Ranges", "bytes")
-                        .header("Content-Transfer-Encoding", "binary")
-                        .header("Content-Range", "bytes " + startRange + "-" + endRange + "/" + fileSize)
-                        .headers(headers)
-                        .body(content);
-            } else {
-                throw new FileNotFoundException("Resource not found: " +
-                        resource.getFilename());
-            }
-        } catch (IOException e) {
-            // Hier könnten Sie einen geeigneten Fehlerstatus zurückgeben
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+
+            return new ServiceResponse(startRange, endRange, content, fileSize);
+        } else {
+            throw new FileNotFoundException("Resource not found: " +
+                    resource.getFilename());
+        }
+    }
+
+    class ServiceResponse {
+        private long start, end;
+        private byte[] content;
+        private long fileSize;
+
+        private ServiceResponse(long start, long end, byte[] content, long fileSize) {
+            this.content = content;
+            this.start = start;
+            this.end = end;
+            this.fileSize = fileSize;
+        }
+
+        public long getStart() {
+            return this.start;
+        }
+
+        public long getFileSize() {
+            return this.fileSize;
+        }
+
+        public long getEnd() {
+            return this.end;
+        }
+
+        public byte[] getContent() {
+            return this.content;
         }
     }
 

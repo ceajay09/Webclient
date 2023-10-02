@@ -24,7 +24,7 @@ public class SendToQueue {
     private ReceiveFromQueue receive;
     private final static String QUEUE_NAME = "validateTokenToBackend";
 
-    public boolean sendToken(String token) throws IOException, TimeoutException, InterruptedException {
+    public boolean validateToken(String token) throws IOException, TimeoutException, InterruptedException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         try (Connection connection = factory.newConnection();
