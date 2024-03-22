@@ -10,6 +10,7 @@
 
     <dependencies>
         <!--Hier können Sie alle benötigten Abhängigkeiten definieren -->
+        <!-- TODO: Remove H2 -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>

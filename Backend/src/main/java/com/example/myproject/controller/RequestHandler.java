@@ -6,6 +6,7 @@ import com.example.myproject.repository.Account;
 import com.example.myproject.repository.AccountRepository;
 import com.example.myproject.repository.Token;
 
+import com.example.myproject.repository.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -95,7 +97,8 @@ public class RequestHandler {
             this.saveAccountToDatabase(accountID);
 
             // Integer id = account.getID();
-            System.out.println(account.getEmail() + " created / " + "ID = " + accountID);
+            logger.info(account.getEmail() + " created / " + "ID = " + accountID);
+//            System.out.println(account.getEmail() + " created / " + "ID = " + accountID);
 
             // Log the response
             String responseMessage = account.getEmail() + " registered successfully";
@@ -162,7 +165,7 @@ public class RequestHandler {
             }
         } else {
             String responseMessage = email + " Incorrect login credentials";
-            logger.info("Registration response: {}", responseMessage);
+            logger.info("Registration response: {}", responseMessage); //TODO: warn?
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect login credentials");
         }
     }
@@ -170,8 +173,9 @@ public class RequestHandler {
     @PostMapping(path = "/api/logout", produces = "application/json")
     public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String token) {
         // Log the request
-        logger.info("Received logout request TODO: email={}",
-                token);
+
+        logger.info("Received logout request from email={}",
+                getAccountFromToken(token).getEmail());
 
         JSONObject responseObject = new JSONObject();
         responseObject.put("status", "success");
@@ -217,7 +221,7 @@ public class RequestHandler {
             logger.info(account.getID() + " saved in Database");
             mongoClient.close();
         } catch (Exception e) {
-            logger.warn("Verbindung mit MongoDB fehlgeschalgen " + e);
+            logger.warn("Verbindung mit MongoDB fehlgeschlagen " + e);
         }
 
     }
@@ -260,7 +264,8 @@ public class RequestHandler {
     }
 
     public void retrieveAllAccountsAndSaveToRepository(AccountRepository accountRepository) {
-        if (alreadyExecuted == false) {
+        if (this.alreadyExecuted == false) {
+            int count = 0;
             // Verbindung zur MongoDB-Datenbank herstellen
             MongoClient mongoClient = this.getMongoClient(mongoConnection);
             MongoDatabase database = mongoClient.getDatabase("MongoDB");
@@ -289,20 +294,20 @@ public class RequestHandler {
 
                 accountRepository.save(account);
                 logger.info("ID-Account " + account.getID() + " saved in Database");
+                count += 1;
             }
-            logger.info("Accounts retrieved from Database");
+            logger.info(count + " Account(s) successfully retrieved from Database");
 
             // MongoDB-Verbindung schließen
             mongoClient.close();
-            alreadyExecuted = true;
+            this.alreadyExecuted = true;
         } else {
-            logger.warn("Accounts retrieved already from Database");
+            logger.info("Accounts retrieved already from Database"); // TODO: Delete or not?
         }
     }
 
     private MongoClient getMongoClient(String mongoConnection) {
         MongoClient mongoClient = null;
-
         String connectionString = mongoConnection + "@mywebapp.pjxdzvf.mongodb.net/?retryWrites=true&w=majority";
 
         // Create a new client and connect to the server
@@ -318,7 +323,7 @@ public class RequestHandler {
             // System.out.println("Pinged your deployment. You successfully connected to
             // MongoDB!");
         } catch (MongoException e) {
-            logger.warn("Verbindung mit MongoDB fehlgeschalgen " + e);
+            logger.warn("Connection to MongoDB Failed " + e);
             e.printStackTrace();
         }
         return mongoClient;
@@ -338,7 +343,7 @@ public class RequestHandler {
             return this.accountRepository.findByEmail(email);
         } catch (Exception e) {
             // Bei Fehler oder ungültigem Token wird eine Exception geworfen
-            logger.warn("getAccountFromToken" + e);
+            logger.warn("Retrieve Account with Token failed " + e);
             return null;
         }
     }

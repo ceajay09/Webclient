@@ -30,18 +30,19 @@ public class Application {
 
         }
 
-        @PostConstruct
-        public void testdata() throws Exception {
-                Account account = new Account();
-                account.setCompany("Google");
-                account.setEmail("admin@admin.com");
-                account.setFirstName("Cesar");
-                account.setLastName("Jaqu");
-                account.setPassword("admin@admin.com");
-                account.setPhoneNumber("123");
-                this.accountRepository.save(account);
-                System.out.println("\nTestaccount erstellt - ID: " + account.getID() + "\n");
 
-        }
+//        @PostConstruct
+//        public void testdata() throws Exception {
+//                Account account = new Account();
+//                account.setCompany("Google");
+//                account.setEmail("admin@admin.com");
+//                account.setFirstName("Cesar");
+//                account.setLastName("Jaqu");
+//                account.setPassword("admin@admin.com");
+//                account.setPhoneNumber("123");
+//                this.accountRepository.save(account);
+//                System.out.println("\nTestaccount erstellt - ID: " + account.getID() + "\n");
+//
+//        }
 
 }

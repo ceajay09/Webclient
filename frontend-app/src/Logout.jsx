@@ -19,8 +19,6 @@ export const sendLogout = (props) => {
             console.log('Logout successful, Token removed:', data);
             // props.handleLogout();
             // Wenn der Benutzer angemeldet ist, wechsle zur Dashboard-Seite
-
-
         })
         .catch(error => {
             console.error('Logout failed:', error);

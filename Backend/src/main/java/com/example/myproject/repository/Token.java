@@ -27,10 +27,11 @@ public class Token {
 				.setExpiration(expirationDate)
 				.signWith(key)
 				.compact();
-		// System.out.println("Key createToken: " + key);
-		System.out.println("Token createToken: " + token);
-		System.out.println("Tokencheck createToken: " + isValidToken(token));
-
+		if(isValidToken(token)){
+			logger.info("Token created and validated");
+		} else {
+			logger.warn("Creation or Validation of Token failed");
+		}
 		return token;
 	}
 
@@ -40,29 +41,34 @@ public class Token {
 				token = token.substring(7);
 			}
 			// System.out.println("Key isValidToken: " + key);
-			System.out.println("Token isValidToken: " + token);
+//			System.out.println("Token isValidToken: " + token);
 			// Token validieren und prüfen, ob die Signatur korrekt ist
 			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
 			return true;
 		} catch (ExpiredJwtException ex) {
 			// Token abgelaufen
-			System.err.println("Token ist abgelaufen: " + ex.getMessage());
+			logger.warn("Token ist abgelaufen: " + ex.getMessage());
+//			System.err.println("Token ist abgelaufen: " + ex.getMessage());
 			return false;
 		} catch (UnsupportedJwtException ex) {
 			// Ungültiges Token
-			System.err.println("Ungültiges Token: " + ex.getMessage());
+			logger.warn("Ungültiges Token: " + ex.getMessage());
+//			System.err.println("Ungültiges Token: " + ex.getMessage());
 			return false;
 		} catch (MalformedJwtException ex) {
 			// Fehlerhaftes Token
-			System.err.println("Fehlerhaftes Token: " + ex.getMessage());
+			logger.warn("Fehlerhaftes Token: " + ex.getMessage());
+//			System.err.println("Fehlerhaftes Token: " + ex.getMessage());
 			return false;
 		} catch (SignatureException ex) {
 			// Fehlerhafte Signatur
-			System.err.println("Fehlerhafte Signatur: " + ex.getMessage());
+			logger.warn("Fehlerhafte Signatur: " + ex.getMessage());
+//			System.err.println("Fehlerhafte Signatur: " + ex.getMessage());
 			return false;
 		} catch (Exception ex) {
 			// Andere Fehler
-			System.err.println("Fehler beim Validieren des Tokens: " + ex.getMessage());
+			logger.warn("Fehler beim Validieren des Tokens: " + ex.getMessage());
+//			System.err.println("Fehler beim Validieren des Tokens: " + ex.getMessage());
 			return false;
 		}
 	}
