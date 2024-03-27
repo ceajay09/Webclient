@@ -9,7 +9,7 @@ import com.rabbitmq.client.Connection;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import org.apache.logging.log4j.LogManager;
 import org.springframework.stereotype.Service;

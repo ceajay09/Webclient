@@ -1,13 +1,15 @@
 package com.example.myproject.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+//import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.myproject.model.Session;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SessionRepository extends JpaRepository<com.example.myproject.repository.Session, Integer>{
+public interface SessionRepository extends MongoRepository<Session, String> {
 	
-	public com.example.myproject.repository.Session findByID(Integer ID);
+	public Session findByID(Integer ID);
 	
-	public com.example.myproject.repository.Session findByToken(String token);
+	public Session findByToken(String token);
 
 }

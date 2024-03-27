@@ -6,9 +6,9 @@ public class sessionTermination implements Runnable {
 
 @Autowired
 private com.example.myproject.repository.SessionRepository sessionRepository;
-private Integer id;
+private String id;
 
-public sessionTermination(Integer id) {
+public sessionTermination(String id) {
 	this.id =id;
 }
 	@Override

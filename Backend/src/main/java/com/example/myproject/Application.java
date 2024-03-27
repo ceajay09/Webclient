@@ -1,20 +1,20 @@
 package com.example.myproject;
 
 //import com.example.myproject.controller.AccountController;
-import com.example.myproject.repository.Account;
 import com.example.myproject.repository.AccountRepository;
 import com.example.myproject.repository.SessionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.sql.SQLException;
-import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 @EnableAsync
+@EnableMongoRepositories
 public class Application {
 
         // @Autowired
