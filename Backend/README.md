@@ -39,3 +39,6 @@ com.example.myproject
 └── util
 ├── TokenUtil.java                // Hilfsfunktionen für Token-Operationen
 └── SomeOtherUtility.java         // Weitere Hilfsfunktionen
+
+TODO: SessionTermination: @Service + @Autowired
+public SessionTerminationService(SessionRepository sessionRepository) {
