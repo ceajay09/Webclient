@@ -1,6 +1,8 @@
-package com.example.myproject.repository;
+package com.example.myproject.config;
 
 import com.example.myproject.model.Account;
+import com.example.myproject.repository.AccountRepository;
+import com.example.myproject.repository.MongoDbService;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -23,7 +25,7 @@ public class ApplicationInitializer {
 
     @Value("${spring.data.mongodb.uri}")
     private String mongoConnection;
-    private final String ACCOUNTS_COLLECTION = "accounts";
+    private final String ACCOUNTS_COLLECTION = "account";
 
     @Autowired
     public ApplicationInitializer(AccountRepository accountRepository, MongoDbService mongoDbService) {
@@ -40,7 +42,7 @@ public class ApplicationInitializer {
         int count = 0;
         // Verbindung zur MongoDB-Datenbank herstellen
         MongoClient mongoClient = mongoDbService.getMongoClient(mongoConnection);
-        MongoDatabase database = mongoClient.getDatabase("MongoDB");
+        MongoDatabase database = mongoClient.getDatabase("mywebapp");
         MongoCollection<Document> collection = database.getCollection(ACCOUNTS_COLLECTION);
 
         // Alle Dokumente in der Collection abrufen
@@ -49,7 +51,7 @@ public class ApplicationInitializer {
         // Durch alle Dokumente iterieren und Accounts erstellen und auf dem
         // AccountRepository speichern
         for (Document doc : documents) {
-            String accountId = doc.getInteger("accountID").toString(); //TODO: Zukünftig handelt es sich bei der id um einen String
+            String accountId = doc.get("_id").toString();
             String email = doc.getString("email");
             String password = doc.getString("password");
             String firstName = doc.getString("firstName");
@@ -64,14 +66,13 @@ public class ApplicationInitializer {
             account.setLastName(lastName);
             account.setPhoneNumber(phoneNumber);
 
-            accountRepository.save(account);
-            logger.info("ID-Account " + account.getID() + " saved in Database");
+//            accountRepository.save(account);
+            logger.info("Account " + account.getEmail() + " saved in Database");
             count += 1;
-
-            logger.info(count + " Account(s) successfully retrieved from Database");
-
-            // MongoDB-Verbindung schließen
-            mongoClient.close();
         }
+        logger.info(count + " Account(s) successfully retrieved from Database");
+
+        // MongoDB-Verbindung schließen
+        mongoClient.close();
     }
 }
